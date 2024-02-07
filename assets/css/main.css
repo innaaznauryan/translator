@@ -1,0 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 150vh;
+}
+
+#__nuxt {
+    max-width: 1150px;
+    margin: 0 auto;
+}
