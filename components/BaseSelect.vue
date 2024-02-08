@@ -14,5 +14,10 @@ const handleChange = (e) => {
 </script>
 
 <style scoped>
-
+select {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
 </style>

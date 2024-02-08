@@ -7,9 +7,21 @@
 
 body {
     min-height: 150vh;
+    font-family: sans-serif;
 }
 
 #__nuxt {
     max-width: 1150px;
     margin: 0 auto;
+}
+
+a {
+    text-decoration: none;
+    color: gray;
+    display: inline-block;
+}
+
+svg {
+    color: cadetblue;
+    cursor: pointer;
 }
