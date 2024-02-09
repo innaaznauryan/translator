@@ -1,5 +1,4 @@
 <template>
-  <BaseHeader/>
   <section
       v-for="section in sections"
       :id="section.id"
@@ -10,12 +9,13 @@
           @submit.prevent="e => submitTitle(e, section)">
         <input required type="text" name="section" :value="section.title[language]">
       </form>
-      <ButtonContainer :id="section.id" :buttonLanguages :handleClick/>
+      <ButtonContainer :id="section.id" :buttonLanguages :toggleEditMode/>
+      <span class="error" v-if="inputError && inputErrorId === section.id">{{ inputError }}</span>
     </template>
     <template v-else>
-      <div class="title">
+      <div class="sectionTitle">
         <h2>{{ section.title[language] }}</h2>
-        <IconEdit @click="handleClick(section.id)"/>
+        <IconEdit @click="toggleEditMode(section.id)"/>
       </div>
     </template>
     <div
@@ -26,13 +26,14 @@
         <form
             :id="'form' + paragraph.id"
             @submit.prevent="e => submitSection(e, section.id, paragraph)">
-          <textarea required name="paragraph" :value="paragraph[language]"></textarea>
+          <textarea required name="paragraph" rows="5" :value="paragraph[language]"></textarea>
         </form>
-        <ButtonContainer :id="paragraph.id" :buttonLanguages :handleClick/>
+        <ButtonContainer :id="paragraph.id" :buttonLanguages :toggleEditMode/>
+        <span class="error" v-if="inputError && inputErrorId === paragraph.id">{{ inputError }}</span>
       </template>
       <template v-else>
         <p>{{ paragraph[language] }}</p>
-        <IconEdit @click="handleClick(paragraph.id)"/>
+        <IconEdit @click="toggleEditMode(paragraph.id)"/>
       </template>
     </div>
   </section>
@@ -50,18 +51,18 @@ if (process.client) {
 import {IconEdit} from '@tabler/icons-vue'
 import {sections} from "~/composable/sections.js"
 import {language} from "~/composable/language.js"
-import {heading} from "~/composable/heading.js"
 
 const buttonLanguages = {
   edit: {english: "Edit", korean: "편집하다"},
   save: {english: "Save", korean: "구하다"},
   cancel: {english: "Cancel", korean: "취소"}
 }
-const title = computed(() => heading.value[language.value])
 const editMode = ref(false)
 const idToEdit = ref(null)
+const inputError = ref(null)
+const inputErrorId = ref(null)
 
-const handleClick = (id) => {
+const toggleEditMode = (id) => {
   if (editMode.value) {
     if (idToEdit.value === id) {
       editMode.value = false
@@ -76,6 +77,10 @@ const handleClick = (id) => {
 }
 
 const submitSection = (e, sectionId, paragraph) => {
+  if (!e.target.paragraph.value.trim()) {
+    handleInputError(paragraph.id)
+    return
+  }
   const updatedParagraph = {...paragraph, [language.value]: e.target.paragraph.value}
   const updatedSections = sections.value.map(section => section.id === sectionId ? {
     ...section,
@@ -88,6 +93,10 @@ const submitSection = (e, sectionId, paragraph) => {
 }
 
 const submitTitle = (e, section) => {
+  if (!e.target.section.value.trim()) {
+    handleInputError(section.id)
+    return
+  }
   const updatedSection = {...section, title: {...section.title, [language.value]: e.target.section.value}}
   const updatedSections = sections.value.map(elem => elem.id === section.id ? updatedSection : elem)
   localStorage.setItem("sections", JSON.stringify(updatedSections))
@@ -96,13 +105,18 @@ const submitTitle = (e, section) => {
   idToEdit.value = null
 }
 
-useHead({
-  title: title
-})
+function handleInputError(id) {
+  inputError.value = "Please fill out this field"
+  inputErrorId.value = id
+  setTimeout(() => {
+    inputError.value = null
+    inputErrorId.value = null
+  }, 3000)
+}
 </script>
 
 <style scoped>
-.title {
+.sectionTitle {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -113,9 +127,24 @@ h2 {
   color: cadetblue;
 }
 
+.error {
+  color: red;
+  padding: 0 5px;
+}
+
 .paragraph {
   margin: 20px 0;
   line-height: 1.5;
+}
+
+svg {
+  opacity: 0;
+  transition: .3s;
+}
+
+.paragraph:hover svg,
+.sectionTitle:hover svg {
+  opacity: 1;
 }
 
 p {
@@ -138,5 +167,6 @@ textarea {
   line-height: 1.5;
   font-family: sans-serif;
   text-align: justify;
+  font-size: 16px;
 }
 </style>

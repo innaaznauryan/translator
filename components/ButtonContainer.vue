@@ -1,26 +1,26 @@
 <template>
   <div class="btnContainer">
-    <BaseButton
-        @click="handleClick(id)">
+    <CommonButton
+        @click="toggleEditMode(id)">
       {{ buttonLanguages.cancel[language] }}
-    </BaseButton>
-    <BaseButton
+    </CommonButton>
+    <CommonButton
         :form="'form' + id"
         type="submit">
       {{ buttonLanguages.save[language] }}
-    </BaseButton>
+    </CommonButton>
   </div>
 </template>
 
 <script setup>
 import {language} from "~/composable/language.js"
 
-defineProps(["id", "buttonLanguages", "handleClick"])
+defineProps(["id", "buttonLanguages", "toggleEditMode"])
 </script>
 
 <style scoped>
 .btnContainer {
-  display: flex;
+  display: inline-flex;
   gap: 5px;
   padding: 5px 0;
 }

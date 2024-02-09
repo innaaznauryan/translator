@@ -1,17 +1,17 @@
 <template>
   <header>
-    <h1>{{ heading[language] }}</h1>
+    <h1>{{ title }}</h1>
     <div class="control">
-      <a v-for="section in sections" :href="'#' + section.id">
-        <BaseButton>
+      <NuxtLink v-for="section in sections" :to="{path: '/', hash: '#' + section.id}">
+        <CommonButton>
           {{ section.title[language] }}
-        </BaseButton>
-      </a>
+        </CommonButton>
+      </NuxtLink>
       <div class="profileContainer" @click="toggleProfile">
         <img v-if="imgMode" :src="user.avatar" alt="">
         <div v-else class="profile">{{ user.first_name[0] + user.last_name[0] }}</div>
       </div>
-      <BaseSelect/>
+      <CommonSelect/>
     </div>
   </header>
 </template>
@@ -19,15 +19,23 @@
 <script setup>
 import {language} from "~/composable/language.js"
 import {sections} from "~/composable/sections.js"
-import {heading} from "~/composable/heading.js"
 
 const response = await useFetch("https://reqres.in/api/users/2")
 const user = response.data.value.data
 const imgMode = ref(false)
+const headings = {
+  english: "My awesome translator",
+  korean: "나의 멋진 번역가"
+}
+const title = computed(() => headings[language.value])
 
 const toggleProfile = () => {
   imgMode.value = !imgMode.value
 }
+
+useHead({
+  title: title
+})
 </script>
 
 <style scoped>
